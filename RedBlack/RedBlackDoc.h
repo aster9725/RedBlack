@@ -53,7 +53,6 @@ public:
 
 typedef struct data
 {
-public:
 	int key;
 	CRect pos;
 	struct rbnode rbt;

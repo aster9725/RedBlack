@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "RBTree.h"
 
+
+
 static struct rbnode NullNode = { 1, };
 
 static struct rbnode* find_replacement(struct rbnode* pTarget)

@@ -168,14 +168,14 @@ void rb_insert(struct rbtree* pTree, struct rbnode* pNewNode)
 	insert_fixup(pTree, pNewNode);
 }
 
-void* rb_search(struct rbtree* pTree, int data)
+RBData* rb_search(struct rbtree* pTree, int data)
 {
 	struct rbnode* probe = pTree->pRoot;
 	RBData* pData = nullptr;
 
 	while (probe != rb_get_nil())
 	{
-		pData = rb_entry(probe, RBData, key);
+		pData = rb_entry(probe, RBData, rbt);
 		if (pData->key == data)
 			break;
 		else if (pData->key < data)
@@ -204,29 +204,29 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 	
 	pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
 	data = _ttoi(str);
-	str.Format(_T("errno : %d | data : %d"), errno, data);
+
+	RBData* pNewNode = rb_search(&m_RBTree, data);
 
 	if (pFrame->IsModeInsert())
 	{
-		RBData* pNewNode = static_cast<RBData*>(rb_search(&m_RBTree, data));
+		
 
-		if (pNewNode != nullptr)
+		if (pNewNode != NULL)
 			MessageBox(pFrame->GetSafeHwnd(), L"중복된 데이터가 존재합니다",L"Insert Error", MB_OK);
 		else
 		{
 			pNewNode = new RBData;
 			pNewNode->key = data;
 			pNewNode->rbt.lft = pNewNode->rbt.rgt = rb_get_nil();
-			pNewNode->rbt.pParentColor = (unsigned long)rb_get_nil();
+			pNewNode->rbt.pParentColor = (UINT64)rb_get_nil();
 			rb_insert(&m_RBTree, &pNewNode->rbt);
 			pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
 		}
 	}
 	else
 	{
-		RBData* pNewNode;
 
-		if (pNewNode = static_cast<RBData*>(rb_search(&m_RBTree, data)))
+		if (pNewNode != NULL)
 		{
 			pNewNode = rb_entry(rb_delete(&m_RBTree, &pNewNode->rbt, rb_copyData), RBData, rbt);
 			pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
