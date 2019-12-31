@@ -54,6 +54,6 @@ public:
 typedef struct data
 {
 	int key;
-	CRect pos;
+	RectF pos;
 	struct rbnode rbt;
 }RBData;

@@ -3,14 +3,29 @@
 //
 
 #pragma once
+#include "RBTree.h"
+#define NODE_SIZE	50
+#define NODE_MARGIN	10
 
-#define NODE_SIZE_MAX 100
-#define NODE_SIZE_MIN 30
+typedef struct _drawtools
+{
+	Graphics& canvas;
+	RectF& canvasRect;
+	Gdiplus::Font& font;
+	StringFormat& strFormat;
+	Pen& pen;
+	SolidBrush& redBrush;
+	SolidBrush& blackBrush;
+	SolidBrush& whiteBrush;
+	Point* points;
+}DRAWTOOLS;
 
 class CRedBlackView : public CView
 {
 private:
-
+	int getTreeMaxDepth(struct rbnode* pNode);
+	void drawTree(DRAWTOOLS& tools, struct rbnode* pNode, int& depth, int& posY);
+	void drawLine(DRAWTOOLS& tools, struct rbnode* pNode);
 protected: // serialization에서만 만들어집니다.
 	CRedBlackView() noexcept;
 	DECLARE_DYNCREATE(CRedBlackView)

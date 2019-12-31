@@ -25,12 +25,75 @@ IMPLEMENT_DYNCREATE(CRedBlackView, CView)
 BEGIN_MESSAGE_MAP(CRedBlackView, CView)
 END_MESSAGE_MAP()
 
+
+#define RECT_COORDINATE(rect)	rect.left, rect.top, rect.Width(), rect.Height()
+
 // CRedBlackView 생성/소멸
+
+int CRedBlackView::getTreeMaxDepth(struct rbnode* pNode)
+{
+	if (pNode == rb_get_nil())
+		return -1;
+	int lft = getTreeMaxDepth(pNode->lft);
+	int rgt = getTreeMaxDepth(pNode->rgt);
+	return lft > rgt ? lft + 1 : rgt + 1;
+}
+
+void CRedBlackView::drawTree(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& posY)
+{
+	if (pNode->lft != rb_get_nil())
+		drawTree(tools, pNode->lft, ++depth, posY);
+
+	RBData* pData = rb_entry(pNode, RBData, rbt);
+	pData->pos.Y = tools.canvasRect.X + depth * NODE_SIZE;
+	pData->pos.X = posY;
+	pData->pos.Width = NODE_SIZE;
+	pData->pos.Height = NODE_SIZE;
+
+	RectF realRect;
+	realRect.X = pData->pos.X + 5;
+	realRect.Y = pData->pos.Y + 5;
+	realRect.Height = pData->pos.Height - 5;
+	realRect.Width = pData->pos.Width - 5;
+
+	tools.canvas.FillEllipse(rb_get_color(pNode) == RED ? &tools.redBrush : &tools.blackBrush, realRect);
+	CString number;
+	number.Format(L"%d", pData->key);
+	tools.canvas.DrawString(number, number.GetLength(), &tools.font, pData->pos, &tools.strFormat, rb_get_color(pNode) == RED ? &tools.blackBrush : &tools.whiteBrush);
+
+	posY += NODE_SIZE;
+
+	if (pNode->rgt != rb_get_nil())
+	{
+		drawTree(tools, pNode->rgt, ++depth, posY);
+	}
+	--depth;
+}
+
+void CRedBlackView::drawLine(DRAWTOOLS& tools, rbnode* pNode)
+{
+
+	if (pNode->lft != rb_get_nil())
+		drawLine(tools, pNode->lft);
+
+	RBData* pData = rb_entry(pNode, RBData, rbt);
+	tools.points[0].X = pData->pos.X + pData->pos.Width / 2;
+	tools.points[0].Y = pData->pos.Y + 5;
+	pData = rb_entry(rb_get_parent(pNode), RBData, rbt);
+	tools.points[2].X = pData->pos.X + pData->pos.Width / 2;
+	tools.points[2].Y = pData->pos.Y + pData->pos.Height;
+	tools.points[1].X = (tools.points[0].X + tools.points[2].X) / 2;
+	tools.points[1].Y = (tools.points[0].Y + tools.points[2].Y) / 2;
+	if(rb_get_parent(pNode) != rb_get_nil())
+		tools.canvas.DrawCurve(&tools.pen, tools.points, 3, 1.0f);
+
+	if (pNode->rgt != rb_get_nil())
+		drawLine(tools, pNode->rgt);
+}
 
 CRedBlackView::CRedBlackView() noexcept
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
-
 }
 
 CRedBlackView::~CRedBlackView()
@@ -47,7 +110,7 @@ BOOL CRedBlackView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CRedBlackView 그리기
 
-#define RECT_COORDINATE(rect)	rect.left, rect.top, rect.Width(), rect.Height()
+
 void CRedBlackView::OnDraw(CDC* pDC)
 {
 	CRedBlackDoc* pDoc = GetDocument();
@@ -56,20 +119,43 @@ void CRedBlackView::OnDraw(CDC* pDC)
 		return;
 
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
-	//RBTree* pTree = pDoc->GetRBTree();
-	int maxHeight, maxWidth;
 
-	CRect canvasRect;
+	pDC->SetROP2(R2_XORPEN);
+
 	Graphics canvas(pDC->m_hDC);
-	Pen pen(Color(255,0,0,0), 5);
-	SolidBrush brush(Color(255,255,0,0));
+	canvas.SetSmoothingMode(SmoothingModeHighQuality);
+	CRect clientRect;
+	GetClientRect(&clientRect);
+	RectF canvasRect(clientRect.left, clientRect.top, clientRect.Width(), clientRect.Height());
+	
+	Gdiplus::Font font(L"Times New Roman", 12, FontStyleBold, UnitPixel);
+	StringFormat strFormat;
+	strFormat.SetLineAlignment(StringAlignmentCenter);
+	strFormat.SetAlignment(StringAlignmentCenter);
+
+	Pen pen(Color(255, 0, 0, 0), 1);
+	SolidBrush redBrush(Color(255, 255, 0, 0));
+	SolidBrush blackBrush(Color(255, 0, 0, 0));
+	SolidBrush whiteBrush(Color(255, 255, 255, 255));
+
+	Point points[3] = { Point(0,0), Point(0,0), Point(0,0) };
+
+	DRAWTOOLS tools = { canvas, canvasRect, font, strFormat, pen, redBrush, blackBrush, whiteBrush, points };
+	
+	canvasRect.X += NODE_SIZE / 2;
+	canvasRect.Y += NODE_SIZE / 2;
+	canvasRect.Width -= NODE_SIZE / 2;
+	canvasRect.Height -= NODE_SIZE / 2;
 
 	struct rbtree* pTree = pDoc->GetRBTree();
+	if (pTree->pRoot == rb_get_nil())
+		return;
 
-	pen.SetAlignment(PenAlignmentInset);
-	
-	GetClientRect(&canvasRect);
-	canvas.DrawEllipse(&pen, RECT_COORDINATE(canvasRect));
+	int depth, posY;
+	depth = 0;
+	posY = canvasRect.Y;
+	drawTree(tools, pTree->pRoot, depth, posY);
+	drawLine(tools, pTree->pRoot);
 }
 
 

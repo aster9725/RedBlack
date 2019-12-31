@@ -224,8 +224,8 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 				pNewNode->key = data;
 				pNewNode->rbt.lft = pNewNode->rbt.rgt = rb_get_nil();
 				pNewNode->rbt.pParentColor = (UINT64)rb_get_nil();
-				pNewNode->pos.top = pNewNode->pos.left = 0;
-				pNewNode->pos.bottom = pNewNode->pos.right = 30;
+				pNewNode->pos.X = pNewNode->pos.Y = 0;
+				pNewNode->pos.Width = pNewNode->pos.Height = 30;
 				rb_insert(&m_RBTree, &pNewNode->rbt);
 				pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
 				UpdateAllViews(NULL);
