@@ -50,6 +50,7 @@ protected:
 	afx_msg void OnAddNode();
 	afx_msg void OnDeleteNode();
 	afx_msg void OnDeleteTree();
+	afx_msg void OnResultOnly();
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnEnUpdateEditNvalue();

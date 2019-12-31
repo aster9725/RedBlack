@@ -22,6 +22,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_ADD_NODE, &CMainFrame::OnAddNode)
 	ON_COMMAND(ID_DELETE_NODE, &CMainFrame::OnDeleteNode)
 	ON_COMMAND(ID_DELETE_TREE, &CMainFrame::OnDeleteTree)
+	ON_COMMAND(ID_SHOW_RESULT_ONLY, &CMainFrame::OnResultOnly)
 	ON_EN_UPDATE(IDC_EDIT_NVALUE, &CMainFrame::OnEnUpdateEditNvalue)
 END_MESSAGE_MAP()
 
@@ -68,13 +69,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: 도구 모음을 도킹할 수 없게 하려면 이 세 줄을 삭제하십시오.
 	
 	
-	int index = m_wndToolBar.CommandToIndex(ID_SKIP_ANIMATE);
+	int index = m_wndToolBar.CommandToIndex(ID_SHOW_RESULT_ONLY);
 	CRect rect;
 	m_wndToolBar.GetItemRect(index, &rect);
 	rect.top += 2;
 	rect.bottom -= 2;
-	rect.right += 100;
-	m_wndToolBar.m_wndCheckBox.Create(L"Show Result Only", BS_CHECKBOX | WS_CHILD | WS_VISIBLE, rect, &m_wndToolBar, ID_SKIP_ANIMATE);
+	rect.right += 300;
+	m_wndToolBar.m_wndCheckBox.Create(L"Show Result Only", BS_CHECKBOX | WS_CHILD | WS_VISIBLE, rect, &m_wndToolBar, ID_SHOW_RESULT_ONLY);
+	m_wndToolBar.m_wndCheckBox.SetCheck(TRUE);
 	m_wndToolBar.m_wndCheckBox.ShowWindow(SW_SHOW);
 	
 
@@ -153,6 +155,11 @@ void CMainFrame::OnDeleteTree()
 		CRedBlackDoc* pDoc = (CRedBlackDoc*)GetActiveDocument();
 		pDoc->ClearRBTree();
 	}
+}
+
+void CMainFrame::OnResultOnly()
+{
+	m_wndToolBar.m_wndCheckBox.SetCheck(!m_wndToolBar.m_wndCheckBox.GetCheck());
 }
 
 
