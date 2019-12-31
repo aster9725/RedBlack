@@ -26,6 +26,61 @@ BEGIN_MESSAGE_MAP(CRedBlackDoc, CDocument)
 	ON_BN_CLICKED(IDC_BTN_ADEL, &CRedBlackDoc::OnBnClickedBtnAdel)
 END_MESSAGE_MAP()
 
+// RBTree 함수 정의	START
+
+void rb_copyData(void* target, void* replacement)
+{
+	RBData* pTarget, * pReplacement;
+	pTarget = rb_entry(target, RBData, rbt);
+	pReplacement = rb_entry(replacement, RBData, rbt);
+	pTarget->key = pReplacement->key;
+	pTarget->pos = pReplacement->pos;
+}
+
+void rb_insert(struct rbtree* pTree, struct rbnode* pNewNode)
+{
+	struct rbnode** probe;
+	RBData* pData = rb_entry(pNewNode, RBData, rbt);
+
+	probe = &pTree->pRoot;
+
+	while (*probe != rb_get_nil())
+	{
+		rb_set_parent(pNewNode, *probe);
+		if (pData->key < rb_entry((*probe), RBData, rbt)->key)
+			probe = &(*probe)->lft;
+		else
+			probe = &(*probe)->rgt;
+	}
+	*probe = pNewNode;
+	pTree->cnt++;
+	insert_fixup(pTree, pNewNode);
+}
+
+RBData* rb_search(struct rbtree* pTree, int data)
+{
+	struct rbnode* probe = pTree->pRoot;
+	RBData* pData = nullptr;
+
+	while (probe != rb_get_nil())
+	{
+		pData = rb_entry(probe, RBData, rbt);
+		if (pData->key == data)
+			break;
+		else if (pData->key < data)
+			probe = probe->rgt;
+		else
+			probe = probe->lft;
+	}
+
+
+	if (probe == rb_get_nil())
+		return nullptr;
+	else
+		return pData;
+}
+
+// RBTree 함수 정의 END
 
 // CRedBlackDoc 생성/소멸
 
@@ -38,6 +93,16 @@ CRedBlackDoc::CRedBlackDoc() noexcept
 
 CRedBlackDoc::~CRedBlackDoc()
 {
+	ClearRBTree();
+}
+
+void CRedBlackDoc::ClearRBTree()
+{
+	while (m_RBTree.cnt > 0)
+	{
+		rb_delete(&m_RBTree, m_RBTree.pRoot, rb_copyData);
+	}
+	UpdateAllViews(NULL);
 }
 
 BOOL CRedBlackDoc::OnNewDocument()
@@ -135,61 +200,6 @@ void CRedBlackDoc::Dump(CDumpContext& dc) const
 	CDocument::Dump(dc);
 }
 #endif //_DEBUG
-
-
-// RBNODE 함수 정의
-
-void rb_copyData(void* target, void* replacement)
-{
-	RBData* pTarget, * pReplacement;
-	pTarget = rb_entry(target, RBData, rbt);
-	pReplacement = rb_entry(replacement, RBData, rbt);
-	pTarget->key = pReplacement->key;
-	pTarget->pos = pReplacement->pos;
-}
-
-void rb_insert(struct rbtree* pTree, struct rbnode* pNewNode)
-{
-	struct rbnode** probe;
-	RBData* pData = rb_entry(pNewNode, RBData, rbt);
-
-	probe = &pTree->pRoot;
-
-	while (*probe != rb_get_nil())
-	{
-		rb_set_parent(pNewNode, *probe);
-		if (pData->key < rb_entry((*probe), RBData, rbt)->key)
-			probe = &(*probe)->lft;
-		else
-			probe = &(*probe)->rgt;
-	}
-	*probe = pNewNode;
-	pTree->cnt++;
-	insert_fixup(pTree, pNewNode);
-}
-
-RBData* rb_search(struct rbtree* pTree, int data)
-{
-	struct rbnode* probe = pTree->pRoot;
-	RBData* pData = nullptr;
-
-	while (probe != rb_get_nil())
-	{
-		pData = rb_entry(probe, RBData, rbt);
-		if (pData->key == data)
-			break;
-		else if (pData->key < data)
-			probe = probe->rgt;
-		else
-			probe = probe->lft;
-	}
-
-
-	if (probe == rb_get_nil())
-		return nullptr;
-	else
-		return pData;
-}
 
 
 // CRedBlackDoc 명령

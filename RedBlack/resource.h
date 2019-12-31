@@ -16,6 +16,7 @@
 #define ID_DELETE_NODE                  32774
 #define ID_DELETE_TREE                  32775
 #define ID_SKIP_ANIMATE                 32776
+#define ID_SHOW_RESULT_ONLY             32776
 
 // Next default values for new objects
 // 

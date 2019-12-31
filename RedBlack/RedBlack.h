@@ -13,6 +13,7 @@
 #include <gdiplus.h>
 using namespace Gdiplus;
 
+
 // CRedBlackApp:
 // 이 클래스의 구현에 대해서는 RedBlack.cpp을(를) 참조하세요.
 //

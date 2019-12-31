@@ -31,6 +31,7 @@ public:
 public:
 	virtual ~CRedBlackDoc();
 	struct rbtree* GetRBTree() { return &m_RBTree; }
+	void ClearRBTree();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

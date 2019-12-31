@@ -74,7 +74,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	rect.top += 2;
 	rect.bottom -= 2;
 	rect.right += 100;
-	m_wndToolBar.m_wndCheckBox.Create(L"Skip Animation", BS_CHECKBOX | WS_CHILD | WS_VISIBLE, rect, &m_wndToolBar, ID_SKIP_ANIMATE);
+	m_wndToolBar.m_wndCheckBox.Create(L"Show Result Only", BS_CHECKBOX | WS_CHILD | WS_VISIBLE, rect, &m_wndToolBar, ID_SKIP_ANIMATE);
 	m_wndToolBar.m_wndCheckBox.ShowWindow(SW_SHOW);
 	
 
@@ -150,11 +150,8 @@ void CMainFrame::OnDeleteTree()
 {
 	if (MessageBox(L"현재 트리를 삭제합니까?", L"RBTree", MB_OKCANCEL) == IDOK)
 	{
-		MessageBox(L"삭제");
-	}
-	else
-	{
-		MessageBox(L"유지");
+		CRedBlackDoc* pDoc = (CRedBlackDoc*)GetActiveDocument();
+		pDoc->ClearRBTree();
 	}
 }
 
@@ -193,11 +190,22 @@ void CMainFrame::OnEnUpdateEditNvalue()
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN &&	
-		GetFocus() == m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE))
+	if (GetFocus() == m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE))
 	{
-		CRedBlackDoc* pDoc = (CRedBlackDoc*)GetActiveDocument();
-		pDoc->OnBnClickedBtnAdel();
+		if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+		{
+			CRedBlackDoc* pDoc = (CRedBlackDoc*)GetActiveDocument();
+			pDoc->OnBnClickedBtnAdel();
+		}
+		else if (::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 86)
+			pMsg->message = WM_PASTE;
+		else if(::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 67)
+			pMsg->message = WM_COPY;
+		else if (::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 65)
+		{
+			CEdit* pEdit = (CEdit*)m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE);
+			pEdit->SetSel(0, -1);
+		}
 	}
 	return CFrameWnd::PreTranslateMessage(pMsg);
 }
