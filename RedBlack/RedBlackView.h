@@ -4,11 +4,12 @@
 
 #pragma once
 
+#define NODE_SIZE_MAX 100
+#define NODE_SIZE_MIN 30
 
 class CRedBlackView : public CView
 {
 private:
-	CList<CRect> rectList;
 
 protected: // serialization에서만 만들어집니다.
 	CRedBlackView() noexcept;

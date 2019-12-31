@@ -199,42 +199,54 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
-	CString str;
-	int data;
+	CString str, message;
+	int data = 0, index = 0;
 	
 	pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
-	data = _ttoi(str);
 
-	RBData* pNewNode = rb_search(&m_RBTree, data);
-
-	if (pFrame->IsModeInsert())
+	data = _ttoi(str.Tokenize(L",", index));
+	for (; index != -1; data = _ttoi(str.Tokenize(L",", index)))
 	{
-		
+		RBData* pNewNode = rb_search(&m_RBTree, data);
 
-		if (pNewNode != NULL)
-			MessageBox(pFrame->GetSafeHwnd(), L"중복된 데이터가 존재합니다",L"Insert Error", MB_OK);
+		if (pFrame->IsModeInsert())
+		{
+
+
+			if (pNewNode != NULL)
+			{
+				message.Format(L"%s (%d)", L"중복된 데이터가 존재합니다", data);
+				MessageBox(pFrame->GetSafeHwnd(), message, L"Insert Error", MB_OK);
+			}
+			else
+			{
+				pNewNode = new RBData;
+				pNewNode->key = data;
+				pNewNode->rbt.lft = pNewNode->rbt.rgt = rb_get_nil();
+				pNewNode->rbt.pParentColor = (UINT64)rb_get_nil();
+				pNewNode->pos.top = pNewNode->pos.left = 0;
+				pNewNode->pos.bottom = pNewNode->pos.right = 30;
+				rb_insert(&m_RBTree, &pNewNode->rbt);
+				pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
+				UpdateAllViews(NULL);
+			}
+		}
 		else
 		{
-			pNewNode = new RBData;
-			pNewNode->key = data;
-			pNewNode->rbt.lft = pNewNode->rbt.rgt = rb_get_nil();
-			pNewNode->rbt.pParentColor = (UINT64)rb_get_nil();
-			rb_insert(&m_RBTree, &pNewNode->rbt);
-			pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
-		}
-	}
-	else
-	{
 
-		if (pNewNode != NULL)
-		{
-			pNewNode = rb_entry(rb_delete(&m_RBTree, &pNewNode->rbt, rb_copyData), RBData, rbt);
-			pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
+			if (pNewNode != NULL)
+			{
+				pNewNode = rb_entry(rb_delete(&m_RBTree, &pNewNode->rbt, rb_copyData), RBData, rbt);
+				pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
+				UpdateAllViews(NULL);
+			}
+			else
+			{
+				message.Format(L"%s (%d)", L"데이터가 존재하지 않습니다", data);
+				MessageBox(pFrame->GetSafeHwnd(), message, L"Delete Error", MB_OK);
+			}
 		}
-		else
-			MessageBox(pFrame->GetSafeHwnd(), L"데이터가 존재하지 않습니다.", L"Delete Error", MB_OK);
 	}
-	
-	UpdateAllViews(NULL);
+	pFrame->lastStr = L"";
 	//SetModifiedFlag();
 }

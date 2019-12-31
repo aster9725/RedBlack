@@ -7,6 +7,7 @@
 #include "RedBlack.h"
 
 #include "MainFrm.h"
+#include "RedBlackDoc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -132,6 +133,8 @@ void CMainFrame::OnAddNode()
 	m_wndDialogBar.GetDlgItem(IDC_MODE_CAPTION)->SetWindowTextW(L"Insert Node");
 	m_wndDialogBar.GetDlgItem(IDC_BTN_ADEL)->SetWindowTextW(L"Insert");
 	m_bModeFlag = true;
+	CStatic* staticText = (CStatic*)m_wndDialogBar.GetDlgItem(IDC_HELP_TEXT);
+	staticText->SetWindowTextW(L"쉼표(,)로 구분된 데이터를 저장합니다.");
 }
 
 void CMainFrame::OnDeleteNode()
@@ -139,6 +142,8 @@ void CMainFrame::OnDeleteNode()
 	m_wndDialogBar.GetDlgItem(IDC_MODE_CAPTION)->SetWindowTextW(L"Delete Node");
 	m_wndDialogBar.GetDlgItem(IDC_BTN_ADEL)->SetWindowTextW(L"Delete");
 	m_bModeFlag = false;
+	CStatic* staticText = (CStatic*)m_wndDialogBar.GetDlgItem(IDC_HELP_TEXT);
+	staticText->SetWindowTextW(L"쉼표(,)로 구분된 데이터를 삭제합니다.");
 }
 
 void CMainFrame::OnDeleteTree()
@@ -163,7 +168,6 @@ void CMainFrame::OnEnUpdateEditNvalue()
 
 	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString str;
-	static CString lastStr = L"";
 
 	CEdit *editText = (CEdit*)m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE);
 	editText->GetWindowTextW(str);
@@ -174,12 +178,26 @@ void CMainFrame::OnEnUpdateEditNvalue()
 	int start, end;
 	editText->GetSel(start, end);
 
-	if (end && (str.GetAt(end-1) < L'0' || str.GetAt(end-1) > L'9'))
+	if (end && ((str.GetAt(end-1) <= L'9' && str.GetAt(end-1) >= L'0') || str.GetAt(end-1) == L','))
 	{
-		
+		lastStr = str;
+	}
+	else
+	{
 		editText->SetWindowTextW(lastStr);
 		editText->SetSel(start - 1, end - 1, true);
 	}
-	else
-		lastStr = str;
+}
+
+
+BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN &&	
+		GetFocus() == m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE))
+	{
+		CRedBlackDoc* pDoc = (CRedBlackDoc*)GetActiveDocument();
+		pDoc->OnBnClickedBtnAdel();
+	}
+	return CFrameWnd::PreTranslateMessage(pMsg);
 }

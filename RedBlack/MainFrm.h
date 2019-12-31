@@ -21,7 +21,7 @@ protected: // serialization에서만 만들어집니다.
 
 // 특성입니다.
 public:
-
+	CString lastStr = L"";	// digit & , Only CString value
 // 작업입니다.
 public:
 	CDialogBar* GetDialogBarPtr() { return &m_wndDialogBar; }
@@ -53,6 +53,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnEnUpdateEditNvalue();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

@@ -47,7 +47,8 @@ BOOL CRedBlackView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CRedBlackView 그리기
 
-void CRedBlackView::OnDraw(CDC* /*pDC*/)
+#define RECT_COORDINATE(rect)	rect.left, rect.top, rect.Width(), rect.Height()
+void CRedBlackView::OnDraw(CDC* pDC)
 {
 	CRedBlackDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -57,7 +58,18 @@ void CRedBlackView::OnDraw(CDC* /*pDC*/)
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 	//RBTree* pTree = pDoc->GetRBTree();
 	int maxHeight, maxWidth;
-	//maxHeight = 
+
+	CRect canvasRect;
+	Graphics canvas(pDC->m_hDC);
+	Pen pen(Color(255,0,0,0), 5);
+	SolidBrush brush(Color(255,255,0,0));
+
+	struct rbtree* pTree = pDoc->GetRBTree();
+
+	pen.SetAlignment(PenAlignmentInset);
+	
+	GetClientRect(&canvasRect);
+	canvas.DrawEllipse(&pen, RECT_COORDINATE(canvasRect));
 }
 
 

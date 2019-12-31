@@ -241,5 +241,6 @@ struct rbnode* rb_delete(struct rbtree* pTree, struct rbnode* target, void (*cop
 	if (rb_get_color(replacement) == BLACK)
 		delete_fixup(pTree, subtree);
 
+	pTree->cnt--;
 	return replacement;
 }
