@@ -24,6 +24,7 @@ public:
 	CString lastStr = L"";	// digit & , Only CString value
 // 작업입니다.
 public:
+	CMainToolBar* GetToolBarPtr() { return &m_wndToolBar; }
 	CDialogBar* GetDialogBarPtr() { return &m_wndDialogBar; }
 	bool IsModeInsert() { return m_bModeFlag; }
 	bool IsSkipAnimation() { return m_bSkipAnimation; }
