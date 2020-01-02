@@ -100,7 +100,7 @@ void CRedBlackDoc::ClearRBTree()
 {
 	while (m_RBTree.cnt > 0)
 	{
-		rb_delete(&m_RBTree, m_RBTree.pRoot, rb_copyData);
+		delete rb_entry(rb_delete(&m_RBTree, m_RBTree.pRoot, rb_copyData), RBData, rbt);
 	}
 	UpdateAllViews(NULL);
 }
@@ -211,14 +211,19 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
 	CString str, message;
 	int data = 0, index = 0;
+	BOOL resultOnly;
 	
 	pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
+	resultOnly = ((CButton*)pFrame->GetToolBarPtr()->GetDlgItem(ID_SHOW_RESULT_ONLY))->GetCheck();
 
-	data = _ttoi(str.Tokenize(L",", index));
-	for (; index != -1; data = _ttoi(str.Tokenize(L",", index)))
+	
+	//for (; index != -1; data = _ttoi(str.Tokenize(L",", index)))
+	do
 	{
+		data = _ttoi(str.Tokenize(L",", index));
 		RBData* pNewNode = rb_search(&m_RBTree, data);
-
+		if (index == -1)
+			break;
 		if (pFrame->IsModeInsert())
 		{
 
@@ -227,6 +232,7 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 			{
 				message.Format(L"%s (%d)", L"중복된 데이터가 존재합니다", data);
 				MessageBox(pFrame->GetSafeHwnd(), message, L"Insert Error", MB_OK);
+				pFrame->GetDialogBarPtr()->GetDlgItem(IDC_EDIT_NVALUE)->SetFocus();
 			}
 			else
 			{
@@ -237,26 +243,27 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 				pNewNode->pos.X = pNewNode->pos.Y = 0;
 				pNewNode->pos.Width = pNewNode->pos.Height = 30;
 				rb_insert(&m_RBTree, &pNewNode->rbt);
-				pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
-				UpdateAllViews(NULL);
 			}
 		}
 		else
 		{
-
 			if (pNewNode != NULL)
 			{
 				pNewNode = rb_entry(rb_delete(&m_RBTree, &pNewNode->rbt, rb_copyData), RBData, rbt);
-				pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, L"");
-				UpdateAllViews(NULL);
+				delete pNewNode;
 			}
 			else
 			{
 				message.Format(L"%s (%d)", L"데이터가 존재하지 않습니다", data);
 				MessageBox(pFrame->GetSafeHwnd(), message, L"Delete Error", MB_OK);
+				pFrame->GetDialogBarPtr()->GetDlgItem(IDC_EDIT_NVALUE)->SetFocus();
 			}
 		}
-	}
-	pFrame->lastStr = L"";
+		str.Delete(0, index);
+		pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, str);
+		pFrame->lastStr = str;
+		index = 0;
+	} while (resultOnly);
+	UpdateAllViews(NULL);
 	//SetModifiedFlag();
 }
