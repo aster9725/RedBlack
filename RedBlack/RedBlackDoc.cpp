@@ -213,8 +213,9 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 	int data = 0, index = 0;
 	BOOL resultOnly;
 	
-	pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
-	resultOnly = ((CButton*)pFrame->GetToolBarPtr()->GetDlgItem(ID_SHOW_RESULT_ONLY))->GetCheck();
+	//pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
+	pFrame->GetDlgItem(IDD_DIALOGBAR)->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
+	resultOnly = pFrame->GetToolBarPtr()->IsDlgButtonChecked(ID_SHOW_RESULT_ONLY);
 
 	
 	//for (; index != -1; data = _ttoi(str.Tokenize(L",", index)))
