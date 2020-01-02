@@ -10,11 +10,13 @@ public:
 	CButton				m_wndCheckBox;
 };
 
+
 class CMainFrame : public CFrameWnd
 {
 private:
 	bool m_bModeFlag;
 	bool m_bSkipAnimation;
+
 protected: // serialization에서만 만들어집니다.
 	CMainFrame() noexcept;
 	DECLARE_DYNCREATE(CMainFrame)
@@ -57,6 +59,7 @@ public:
 	afx_msg void OnEnUpdateEditNvalue();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnDropFiles(HDROP hDropInfo);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 };
 
 

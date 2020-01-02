@@ -4,6 +4,7 @@
 
 #pragma once
 #include "RBTree.h"
+
 #define DEF_NODE_SIZE	80
 #define NODE_MARGIN		10
 #define NODE_SIZE_MAX	200
@@ -26,6 +27,7 @@ class CRedBlackView : public CView
 {
 private:
 	int m_nNodeSize;
+	BOOL m_bMoveFlag;
 	PointF m_nWndOffset;
 	CPoint m_nMousePoint;
 
@@ -39,10 +41,11 @@ protected: // serialization에서만 만들어집니다.
 // 특성입니다.
 public:
 	CRedBlackDoc* GetDocument() const;
-	void ResetWndOffset();
+	
+	BOOL isMoveMode() { return m_bMoveFlag; }
 // 작업입니다.
 public:
-
+	void ResetWndOffset();
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pDC);  // 이 뷰를 그리기 위해 재정의되었습니다.
@@ -68,6 +71,10 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnPaint();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 };
 
 #ifndef _DEBUG  // RedBlackView.cpp의 디버그 버전

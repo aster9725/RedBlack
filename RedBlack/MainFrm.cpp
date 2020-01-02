@@ -26,6 +26,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_SHOW_RESULT_ONLY, &CMainFrame::OnResultOnly)
 	ON_EN_UPDATE(IDC_EDIT_NVALUE, &CMainFrame::OnEnUpdateEditNvalue)
 	ON_WM_DROPFILES()
+	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -201,6 +202,13 @@ void CMainFrame::OnEnUpdateEditNvalue()
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	
+	if (pMsg->message == WM_DROPFILES)
+	{
+		SendMessage(WM_DROPFILES, pMsg->wParam, pMsg->lParam);
+		return TRUE;
+	}
+
 	if (GetFocus() == m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE))
 	{
 		if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
@@ -210,14 +218,12 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 		}
 		else if (::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 86)
 			pMsg->message = WM_PASTE;
-		else if(::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 67)
+		else if (::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 67)
 			pMsg->message = WM_COPY;
 		else if (::GetKeyState(VK_CONTROL) < 0 && pMsg->wParam == 65)
-		{
-			CEdit* pEdit = (CEdit*)m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE);
-			pEdit->SetSel(0, -1);
-		}
+			((CEdit*)GetDlgItem(IDC_EDIT_NVALUE))->SetSel(0, -1);
 	}
+
 	return CFrameWnd::PreTranslateMessage(pMsg);
 }
 
@@ -225,6 +231,45 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	MessageBox(L"file input");
+	int cntFiles = DragQueryFileW(hDropInfo, -1, nullptr, 0);;
+	wchar_t filePath[MAX_PATH] = { 0 };
+	//wchar_t fileBuffer[256] = { 0 };
+	CString mergedFileContent, fileBuffer;
+	CFile file;
+	CFileException e;
+	CEdit* wndEditBox = (CEdit*)(m_wndDialogBar.GetDlgItem(IDC_EDIT_NVALUE));
+	wndEditBox->GetWindowTextW(mergedFileContent);
+
+	for (int i = 0; i < cntFiles; i++)
+	{
+		DragQueryFileW(hDropInfo, i, filePath, MAX_PATH);
+
+		CStdioFile input(filePath, CFile::modeRead);
+
+		try {
+			while (input.ReadString(fileBuffer))
+			{
+				mergedFileContent.Append(fileBuffer);
+				mergedFileContent.AppendChar(L',');
+			}
+		}
+		catch (CArchiveException * e) {
+			e->ReportError();
+		}
+		
+		input.Close();
+	}
+	DragFinish(hDropInfo);
+
+	wndEditBox->SetWindowTextW(mergedFileContent);
+
 	CFrameWnd::OnDropFiles(hDropInfo);
+}
+
+BOOL CMainFrame::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (((CRedBlackView*)GetActiveView())->isMoveMode())
+		return TRUE;
+	return CFrameWnd::OnSetCursor(pWnd, nHitTest, message);
 }
