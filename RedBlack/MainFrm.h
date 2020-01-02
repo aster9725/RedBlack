@@ -26,7 +26,6 @@ public:
 // 작업입니다.
 public:
 	CMainToolBar* GetToolBarPtr() { return &m_wndToolBar; }
-	CDialogBar* GetDialogBarPtr() { return &m_wndDialogBar; }
 	bool IsModeInsert() { return m_bModeFlag; }
 // 재정의입니다.
 public:

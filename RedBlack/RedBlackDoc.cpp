@@ -213,7 +213,6 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 	int data = 0, index = 0;
 	BOOL resultOnly;
 	
-	//pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
 	pFrame->GetDlgItem(IDD_DIALOGBAR)->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
 	resultOnly = pFrame->GetToolBarPtr()->IsDlgButtonChecked(ID_SHOW_RESULT_ONLY);
 
@@ -233,7 +232,7 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 			{
 				message.Format(L"%s (%d)", L"중복된 데이터가 존재합니다", data);
 				MessageBox(pFrame->GetSafeHwnd(), message, L"Insert Error", MB_OK);
-				pFrame->GetDialogBarPtr()->GetDlgItem(IDC_EDIT_NVALUE)->SetFocus();
+				pFrame->GetDlgItem(IDD_DIALOGBAR)->GetDlgItem(IDC_EDIT_NVALUE)->SetFocus();
 			}
 			else
 			{
@@ -257,11 +256,11 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 			{
 				message.Format(L"%s (%d)", L"데이터가 존재하지 않습니다", data);
 				MessageBox(pFrame->GetSafeHwnd(), message, L"Delete Error", MB_OK);
-				pFrame->GetDialogBarPtr()->GetDlgItem(IDC_EDIT_NVALUE)->SetFocus();
+				pFrame->GetDlgItem(IDD_DIALOGBAR)->GetDlgItem(IDC_EDIT_NVALUE)->SetFocus();
 			}
 		}
 		str.Delete(0, index);
-		pFrame->GetDialogBarPtr()->SetDlgItemTextW(IDC_EDIT_NVALUE, str);
+		pFrame->GetDlgItem(IDD_DIALOGBAR)->SetDlgItemTextW(IDC_EDIT_NVALUE, str);
 		pFrame->lastStr = str;
 		index = 0;
 	} while (resultOnly);
