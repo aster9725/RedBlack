@@ -4,8 +4,10 @@
 
 #pragma once
 #include "RBTree.h"
-#define NODE_SIZE	50
-#define NODE_MARGIN	10
+#define DEF_NODE_SIZE	80
+#define NODE_MARGIN		10
+#define NODE_SIZE_MAX	200
+#define NODE_SIZE_MIN	30
 
 typedef struct _drawtools
 {
@@ -23,6 +25,10 @@ typedef struct _drawtools
 class CRedBlackView : public CView
 {
 private:
+	int m_nNodeSize;
+	PointF m_nWndOffset;
+	CPoint m_nMousePoint;
+
 	int getTreeMaxDepth(struct rbnode* pNode);
 	void drawTree(DRAWTOOLS& tools, struct rbnode* pNode, int& depth, int& posY);
 	void drawLine(DRAWTOOLS& tools, struct rbnode* pNode);
@@ -56,6 +62,10 @@ protected:
 // 생성된 메시지 맵 함수
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // RedBlackView.cpp의 디버그 버전

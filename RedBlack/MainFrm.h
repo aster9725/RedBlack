@@ -56,6 +56,7 @@ protected:
 public:
 	afx_msg void OnEnUpdateEditNvalue();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnDropFiles(HDROP hDropInfo);
 };
 
 

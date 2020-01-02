@@ -24,6 +24,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_DELETE_TREE, &CMainFrame::OnDeleteTree)
 	ON_COMMAND(ID_SHOW_RESULT_ONLY, &CMainFrame::OnResultOnly)
 	ON_EN_UPDATE(IDC_EDIT_NVALUE, &CMainFrame::OnEnUpdateEditNvalue)
+	ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -215,4 +216,12 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 	return CFrameWnd::PreTranslateMessage(pMsg);
+}
+
+
+void CMainFrame::OnDropFiles(HDROP hDropInfo)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	MessageBox(L"file input");
+	CFrameWnd::OnDropFiles(hDropInfo);
 }
