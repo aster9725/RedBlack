@@ -8,6 +8,7 @@
 
 #include "MainFrm.h"
 #include "RedBlackDoc.h"
+#include "RedBlackView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -155,6 +156,8 @@ void CMainFrame::OnDeleteTree()
 	{
 		CRedBlackDoc* pDoc = (CRedBlackDoc*)GetActiveDocument();
 		pDoc->ClearRBTree();
+		CRedBlackView* pView = (CRedBlackView*)((CMainFrame*)AfxGetMainWnd())->GetActiveView();
+		pView->ResetWndOffset();
 	}
 }
 

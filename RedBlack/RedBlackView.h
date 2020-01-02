@@ -29,9 +29,9 @@ private:
 	PointF m_nWndOffset;
 	CPoint m_nMousePoint;
 
-	int getTreeMaxDepth(struct rbnode* pNode);
-	void drawTree(DRAWTOOLS& tools, struct rbnode* pNode, int& depth, int& posY);
+	void drawTree(CDC* pDC);
 	void drawLine(DRAWTOOLS& tools, struct rbnode* pNode);
+	void drawNode(DRAWTOOLS& tools, struct rbnode* pNode, int& depth, int& posY);
 protected: // serialization에서만 만들어집니다.
 	CRedBlackView() noexcept;
 	DECLARE_DYNCREATE(CRedBlackView)
@@ -39,7 +39,7 @@ protected: // serialization에서만 만들어집니다.
 // 특성입니다.
 public:
 	CRedBlackDoc* GetDocument() const;
-
+	void ResetWndOffset();
 // 작업입니다.
 public:
 
@@ -66,6 +66,8 @@ public:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnPaint();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
 #ifndef _DEBUG  // RedBlackView.cpp의 디버그 버전

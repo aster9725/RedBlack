@@ -26,6 +26,8 @@ BEGIN_MESSAGE_MAP(CRedBlackView, CView)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_PAINT()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -33,19 +35,10 @@ END_MESSAGE_MAP()
 
 // CRedBlackView 생성/소멸
 
-int CRedBlackView::getTreeMaxDepth(struct rbnode* pNode)
-{
-	if (pNode == rb_get_nil())
-		return -1;
-	int lft = getTreeMaxDepth(pNode->lft);
-	int rgt = getTreeMaxDepth(pNode->rgt);
-	return lft > rgt ? lft + 1 : rgt + 1;
-}
-
-void CRedBlackView::drawTree(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& posY)
+void CRedBlackView::drawNode(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& posY)
 {
 	if (pNode->lft != rb_get_nil())
-		drawTree(tools, pNode->lft, ++depth, posY);
+		drawNode(tools, pNode->lft, ++depth, posY);
 
 	RBData* pData = rb_entry(pNode, RBData, rbt);
 	pData->pos.Y = tools.canvasRect.X + depth * m_nNodeSize;
@@ -68,10 +61,55 @@ void CRedBlackView::drawTree(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& p
 	posY += m_nNodeSize;
 
 	if (pNode->rgt != rb_get_nil())
-	{
-		drawTree(tools, pNode->rgt, ++depth, posY);
-	}
+		drawNode(tools, pNode->rgt, ++depth, posY);
 	--depth;
+}
+
+void CRedBlackView::drawTree(CDC* pDC)
+{
+	CRedBlackDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	pDC->SetROP2(R2_XORPEN);
+
+	Graphics canvas(pDC->m_hDC);
+	canvas.SetSmoothingMode(SmoothingModeHighQuality);
+	CRect clientRect;
+	GetClientRect(&clientRect);
+	RectF canvasRect(clientRect.left, clientRect.top, clientRect.Width(), clientRect.Height());
+
+	Gdiplus::Font font(L"Times New Roman", 12, FontStyleBold, UnitPixel);
+	StringFormat strFormat;
+	strFormat.SetLineAlignment(StringAlignmentCenter);
+	strFormat.SetAlignment(StringAlignmentCenter);
+
+	Pen pen(Color(255, 0, 0, 0), 1);
+	SolidBrush redBrush(Color(255, 255, 0, 0));
+	SolidBrush blackBrush(Color(255, 0, 0, 0));
+	SolidBrush whiteBrush(Color(255, 255, 255, 255));
+
+	Point points[3] = { Point(0,0), Point(0,0), Point(0,0) };
+
+	DRAWTOOLS tools = { canvas, canvasRect, font, strFormat, pen, redBrush, blackBrush, whiteBrush, points };
+
+	canvasRect.X += NODE_MARGIN / 2;
+	canvasRect.Y += NODE_MARGIN / 2;
+	canvasRect.Width -= NODE_MARGIN;
+	canvasRect.Height -= NODE_MARGIN;
+
+	//canvas.DrawRectangle(&pen, canvasRect);
+
+	struct rbtree* pTree = pDoc->GetRBTree();
+	if (pTree->pRoot == rb_get_nil())
+		return;
+
+	int depth, posY;
+	depth = 0;
+	posY = canvasRect.Y;
+	drawNode(tools, pTree->pRoot, depth, posY);
+	drawLine(tools, pTree->pRoot);
 }
 
 void CRedBlackView::drawLine(DRAWTOOLS& tools, rbnode* pNode)
@@ -102,6 +140,11 @@ CRedBlackView::CRedBlackView() noexcept
 	m_nWndOffset.X = m_nWndOffset.Y = 0;
 }
 
+void CRedBlackView::ResetWndOffset()
+{
+	m_nWndOffset.X = m_nWndOffset.Y = 0;
+}
+
 CRedBlackView::~CRedBlackView()
 {
 }
@@ -119,51 +162,51 @@ BOOL CRedBlackView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CRedBlackView::OnDraw(CDC* pDC)
 {
-	CRedBlackDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-	if (!pDoc)
-		return;
+	//CRedBlackDoc* pDoc = GetDocument();
+	//ASSERT_VALID(pDoc);
+	//if (!pDoc)
+	//	return;
 
-	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
+	//// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 
-	pDC->SetROP2(R2_XORPEN);
+	//pDC->SetROP2(R2_XORPEN);
 
-	Graphics canvas(pDC->m_hDC);
-	canvas.SetSmoothingMode(SmoothingModeHighQuality);
-	CRect clientRect;
-	GetClientRect(&clientRect);
-	RectF canvasRect(clientRect.left, clientRect.top, clientRect.Width(), clientRect.Height());
-	
-	Gdiplus::Font font(L"Times New Roman", 12, FontStyleBold, UnitPixel);
-	StringFormat strFormat;
-	strFormat.SetLineAlignment(StringAlignmentCenter);
-	strFormat.SetAlignment(StringAlignmentCenter);
+	//Graphics canvas(pDC->m_hDC);
+	//canvas.SetSmoothingMode(SmoothingModeHighQuality);
+	//CRect clientRect;
+	//GetClientRect(&clientRect);
+	//RectF canvasRect(clientRect.left, clientRect.top, clientRect.Width(), clientRect.Height());
+	//
+	//Gdiplus::Font font(L"Times New Roman", 12, FontStyleBold, UnitPixel);
+	//StringFormat strFormat;
+	//strFormat.SetLineAlignment(StringAlignmentCenter);
+	//strFormat.SetAlignment(StringAlignmentCenter);
 
-	Pen pen(Color(255, 0, 0, 0), 1);
-	SolidBrush redBrush(Color(255, 255, 0, 0));
-	SolidBrush blackBrush(Color(255, 0, 0, 0));
-	SolidBrush whiteBrush(Color(255, 255, 255, 255));
+	//Pen pen(Color(255, 0, 0, 0), 1);
+	//SolidBrush redBrush(Color(255, 255, 0, 0));
+	//SolidBrush blackBrush(Color(255, 0, 0, 0));
+	//SolidBrush whiteBrush(Color(255, 255, 255, 255));
 
-	Point points[3] = { Point(0,0), Point(0,0), Point(0,0) };
+	//Point points[3] = { Point(0,0), Point(0,0), Point(0,0) };
 
-	DRAWTOOLS tools = { canvas, canvasRect, font, strFormat, pen, redBrush, blackBrush, whiteBrush, points };
-	
-	canvasRect.X += NODE_MARGIN / 2;
-	canvasRect.Y += NODE_MARGIN / 2;
-	canvasRect.Width -= NODE_MARGIN;
-	canvasRect.Height -= NODE_MARGIN;
+	//DRAWTOOLS tools = { canvas, canvasRect, font, strFormat, pen, redBrush, blackBrush, whiteBrush, points };
+	//
+	//canvasRect.X += NODE_MARGIN / 2;
+	//canvasRect.Y += NODE_MARGIN / 2;
+	//canvasRect.Width -= NODE_MARGIN;
+	//canvasRect.Height -= NODE_MARGIN;
 
-	//canvas.DrawRectangle(&pen, canvasRect);
+	////canvas.DrawRectangle(&pen, canvasRect);
 
-	struct rbtree* pTree = pDoc->GetRBTree();
-	if (pTree->pRoot == rb_get_nil())
-		return;
+	//struct rbtree* pTree = pDoc->GetRBTree();
+	//if (pTree->pRoot == rb_get_nil())
+	//	return;
 
-	int depth, posY;
-	depth = 0;
-	posY = canvasRect.Y;
-	drawTree(tools, pTree->pRoot, depth, posY);
-	drawLine(tools, pTree->pRoot);
+	//int depth, posY;
+	//depth = 0;
+	//posY = canvasRect.Y;
+	//drawNode(tools, pTree->pRoot, depth, posY);
+	//drawLine(tools, pTree->pRoot);
 }
 
 
@@ -218,7 +261,7 @@ BOOL CRedBlackView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CRedBlackView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	if (nFlags & MK_LBUTTON)
+	if ((nFlags & MK_LBUTTON) && (nFlags & MK_CONTROL))
 	{
 		m_nWndOffset.X += point.x - m_nMousePoint.x;
 		m_nWndOffset.Y += point.y - m_nMousePoint.y;
@@ -234,4 +277,41 @@ void CRedBlackView::OnLButtonDown(UINT nFlags, CPoint point)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	m_nMousePoint = point;
 	CView::OnLButtonDown(nFlags, point);
+}
+
+
+void CRedBlackView::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+					   // TODO: 여기에 메시지 처리기 코드를 추가합니다.
+					   // 그리기 메시지에 대해서는 CView::OnPaint()을(를) 호출하지 마십시오.
+
+	// Double Buffering
+
+	CRect rect;
+	GetClientRect(rect);
+
+	CDC MemDC;
+	CBitmap* pOldBitmap;
+	CBitmap bmp;
+
+	MemDC.CreateCompatibleDC(&dc);
+	bmp.CreateCompatibleBitmap(&dc, rect.Width(), rect.Height());
+	pOldBitmap = (CBitmap*)MemDC.SelectObject(&bmp);
+	MemDC.PatBlt(0, 0, rect.Width(), rect.Height(), WHITENESS);
+
+	drawTree(&MemDC);
+
+	dc.BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
+	MemDC.SelectObject(pOldBitmap);
+	MemDC.DeleteDC();
+}
+
+
+BOOL CRedBlackView::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	//return CView::OnEraseBkgnd(pDC);
+	return TRUE;
 }
