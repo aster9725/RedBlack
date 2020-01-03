@@ -241,7 +241,6 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 				pNewNode->rbt.pParentColor = (UINT64)rb_get_nil();
 			#endif
 				pNewNode->pos.X = pNewNode->pos.Y = 0;
-				//pNewNode->pos.Width = pNewNode->pos.Height = 50;
 				rb_insert(&m_RBTree, &pNewNode->rbt);
 			}
 		}
@@ -265,5 +264,4 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 		index = 0;
 	} while (resultOnly);
 	UpdateAllViews(NULL);
-	//SetModifiedFlag();
 }
