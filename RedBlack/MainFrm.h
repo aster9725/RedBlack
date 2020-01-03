@@ -14,8 +14,7 @@ public:
 class CMainFrame : public CFrameWnd
 {
 private:
-	bool m_bModeFlag;
-	bool m_bSkipAnimation;
+	BOOL m_bModeFlag;
 
 protected: // serialization에서만 만들어집니다.
 	CMainFrame() noexcept;
@@ -27,9 +26,7 @@ public:
 // 작업입니다.
 public:
 	CMainToolBar* GetToolBarPtr() { return &m_wndToolBar; }
-	CDialogBar* GetDialogBarPtr() { return &m_wndDialogBar; }
 	bool IsModeInsert() { return m_bModeFlag; }
-	bool IsSkipAnimation() { return m_bSkipAnimation; }
 // 재정의입니다.
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

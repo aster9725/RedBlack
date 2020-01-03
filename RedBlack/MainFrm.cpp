@@ -43,7 +43,6 @@ CMainFrame::CMainFrame() noexcept
 {
 	// TODO: 여기에 멤버 초기화 코드를 추가합니다.
 	m_bModeFlag = true;
-	m_bSkipAnimation = true;
 }
 
 CMainFrame::~CMainFrame()

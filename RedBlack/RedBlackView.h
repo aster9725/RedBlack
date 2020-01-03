@@ -12,24 +12,24 @@
 
 typedef struct _drawtools
 {
-	Graphics& canvas;
-	RectF& canvasRect;
-	Gdiplus::Font& font;
-	StringFormat& strFormat;
-	Pen& pen;
-	SolidBrush& redBrush;
-	SolidBrush& blackBrush;
-	SolidBrush& whiteBrush;
-	Point* points;
+	Graphics&		canvas;
+	RectF&			canvasRect;
+	Gdiplus::Font&	font;
+	StringFormat&	strFormat;
+	Pen&			pen;
+	SolidBrush&		redBrush;
+	SolidBrush&		blackBrush;
+	SolidBrush&		whiteBrush;
+	Point*			points;
 }DRAWTOOLS;
 
 class CRedBlackView : public CView
 {
 private:
-	int m_nNodeSize;
-	BOOL m_bMoveFlag;
-	PointF m_nWndOffset;
-	CPoint m_nMousePoint;
+	int		m_nNodeSize;
+	BOOL	m_bMoveFlag;
+	PointF	m_nWndOffset;
+	CPoint	m_nMousePoint;
 
 	void drawTree(CDC* pDC);
 	void drawLine(DRAWTOOLS& tools, struct rbnode* pNode);
