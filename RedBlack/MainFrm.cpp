@@ -242,20 +242,19 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	{
 		DragQueryFileW(hDropInfo, i, filePath, MAX_PATH);
 
-		CStdioFile input(filePath, CFile::modeRead);
-
 		try {
+			CStdioFile input(filePath, CFile::modeRead);
 			while (input.ReadString(fileBuffer))
 			{
 				mergedFileContent.Append(fileBuffer);
 				mergedFileContent.AppendChar(L',');
 			}
+			input.Close();
 		}
-		catch (CArchiveException * e) {
+		catch (CNotSupportedException * e) {
+			MessageBox(L"파일 읽기 실패");
 			e->ReportError();
 		}
-		
-		input.Close();
 	}
 	DragFinish(hDropInfo);
 

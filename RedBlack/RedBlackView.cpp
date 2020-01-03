@@ -44,21 +44,28 @@ void CRedBlackView::drawNode(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& p
 	if (pNode->lft != rb_get_nil())
 		drawNode(tools, pNode->lft, ++depth, posY);
 
+	// Store node position refered from (0,0)
+	// Swap X,Y corrdinate to transform tree
 	RBData* pData = rb_entry(pNode, RBData, rbt);
 	pData->pos.Y = tools.canvasRect.X + depth * m_nNodeSize;
 	pData->pos.X = posY;
 
+	// Calculate real position of node to draw
 	RectF realRect;
 	realRect.X = m_nWndOffset.X + pData->pos.X + NODE_MARGIN/2;
 	realRect.Y = m_nWndOffset.Y + pData->pos.Y + NODE_MARGIN/2;
 	realRect.Width = realRect.Height = m_nNodeSize - NODE_MARGIN;
 	
-
+	// Draw node circle
 	tools.canvas.FillEllipse(rb_get_color(pNode) == RED ? &tools.redBrush : &tools.blackBrush, realRect);
+
+	// Draw node data on the circle
 	CString number;
 	number.Format(L"%d", pData->key);
-	tools.canvas.DrawString(number, number.GetLength(), &tools.font, realRect, &tools.strFormat, rb_get_color(pNode) == RED ? &tools.blackBrush : &tools.whiteBrush);
+	tools.canvas.DrawString(number, number.GetLength(), &tools.font, realRect, &tools.strFormat, 
+		rb_get_color(pNode) == RED ? &tools.blackBrush : &tools.whiteBrush);
 
+	// Go to next Line
 	posY += m_nNodeSize;
 
 	if (pNode->rgt != rb_get_nil())
@@ -73,7 +80,7 @@ void CRedBlackView::drawTree(CDC* pDC)
 	if (!pDoc)
 		return;
 
-	pDC->SetROP2(R2_XORPEN);
+	//pDC->SetROP2(R2_XORPEN);
 
 	Graphics canvas(pDC->m_hDC);
 	canvas.SetSmoothingMode(SmoothingModeHighQuality);
@@ -119,14 +126,19 @@ void CRedBlackView::drawLine(DRAWTOOLS& tools, rbnode* pNode)
 	if (pNode->lft != rb_get_nil())
 		drawLine(tools, pNode->lft);
 
+	// child point
 	RBData* pData = rb_entry(pNode, RBData, rbt);
 	tools.points[0].X = m_nWndOffset.X + pData->pos.X + m_nNodeSize / 2;
 	tools.points[0].Y = m_nWndOffset.Y + pData->pos.Y + NODE_MARGIN / 2;
+	// parent point
 	pData = rb_entry(rb_get_parent(pNode), RBData, rbt);
 	tools.points[2].X = m_nWndOffset.X + pData->pos.X + m_nNodeSize / 2;
 	tools.points[2].Y = m_nWndOffset.Y + pData->pos.Y + m_nNodeSize - NODE_MARGIN / 2;
+	// middle point
 	tools.points[1].X = (tools.points[0].X + tools.points[2].X) / 2;
 	tools.points[1].Y = (tools.points[0].Y + tools.points[2].Y) / 2;
+	
+	// Draw line if pNode is not root node
 	if(rb_get_parent(pNode) != rb_get_nil())
 		tools.canvas.DrawCurve(&tools.pen, tools.points, 3, 0.3f);
 
@@ -245,6 +257,14 @@ void CRedBlackView::OnLButtonDown(UINT nFlags, CPoint point)
 }
 
 
+void CRedBlackView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	ReleaseCapture();
+	CView::OnLButtonUp(nFlags, point);
+}
+
+
 void CRedBlackView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
@@ -266,6 +286,7 @@ void CRedBlackView::OnPaint()
 	MemDC.PatBlt(0, 0, rect.Width(), rect.Height(), WHITENESS);
 
 	drawTree(&MemDC);
+	//drawTree(&dc);
 
 	dc.BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
 	MemDC.SelectObject(pOldBitmap);
@@ -279,14 +300,6 @@ BOOL CRedBlackView::OnEraseBkgnd(CDC* pDC)
 
 	//return CView::OnEraseBkgnd(pDC);
 	return TRUE;
-}
-
-
-void CRedBlackView::OnLButtonUp(UINT nFlags, CPoint point)
-{
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	ReleaseCapture();
-	CView::OnLButtonUp(nFlags, point);
 }
 
 
