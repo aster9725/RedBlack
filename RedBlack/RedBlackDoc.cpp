@@ -216,8 +216,6 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 	pFrame->GetDialogBarPtr()->GetDlgItemTextW(IDC_EDIT_NVALUE, str);
 	resultOnly = ((CButton*)pFrame->GetToolBarPtr()->GetDlgItem(ID_SHOW_RESULT_ONLY))->GetCheck();
 
-	
-	//for (; index != -1; data = _ttoi(str.Tokenize(L",", index)))
 	do
 	{
 		data = _ttoi(str.Tokenize(L",", index));
@@ -226,8 +224,6 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 			break;
 		if (pFrame->IsModeInsert())
 		{
-
-
 			if (pNewNode != NULL)
 			{
 				message.Format(L"%s (%d)", L"중복된 데이터가 존재합니다", data);
@@ -239,9 +235,13 @@ void CRedBlackDoc::OnBnClickedBtnAdel()
 				pNewNode = new RBData;
 				pNewNode->key = data;
 				pNewNode->rbt.lft = pNewNode->rbt.rgt = rb_get_nil();
+			#ifdef _M_IX86
+				pNewNode->rbt.pParentColor = (unsigned long)rb_get_nil();
+			#else
 				pNewNode->rbt.pParentColor = (UINT64)rb_get_nil();
+			#endif
 				pNewNode->pos.X = pNewNode->pos.Y = 0;
-				pNewNode->pos.Width = pNewNode->pos.Height = 30;
+				//pNewNode->pos.Width = pNewNode->pos.Height = 50;
 				rb_insert(&m_RBTree, &pNewNode->rbt);
 			}
 		}

@@ -233,7 +233,6 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	int cntFiles = DragQueryFileW(hDropInfo, -1, nullptr, 0);;
 	wchar_t filePath[MAX_PATH] = { 0 };
-	//wchar_t fileBuffer[256] = { 0 };
 	CString mergedFileContent, fileBuffer;
 	CFile file;
 	CFileException e;

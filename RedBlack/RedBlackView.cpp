@@ -47,20 +47,17 @@ void CRedBlackView::drawNode(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& p
 	RBData* pData = rb_entry(pNode, RBData, rbt);
 	pData->pos.Y = tools.canvasRect.X + depth * m_nNodeSize;
 	pData->pos.X = posY;
-	pData->pos.Width = m_nNodeSize;
-	pData->pos.Height = m_nNodeSize;
 
 	RectF realRect;
 	realRect.X = m_nWndOffset.X + pData->pos.X + NODE_MARGIN/2;
 	realRect.Y = m_nWndOffset.Y + pData->pos.Y + NODE_MARGIN/2;
-	realRect.Height = pData->pos.Height - NODE_MARGIN;
-	realRect.Width = pData->pos.Width - NODE_MARGIN;
+	realRect.Width = realRect.Height = m_nNodeSize - NODE_MARGIN;
+	
 
 	tools.canvas.FillEllipse(rb_get_color(pNode) == RED ? &tools.redBrush : &tools.blackBrush, realRect);
 	CString number;
 	number.Format(L"%d", pData->key);
 	tools.canvas.DrawString(number, number.GetLength(), &tools.font, realRect, &tools.strFormat, rb_get_color(pNode) == RED ? &tools.blackBrush : &tools.whiteBrush);
-	//tools.canvas.DrawRectangle(&tools.pen, pData->pos);
 
 	posY += m_nNodeSize;
 
@@ -123,11 +120,11 @@ void CRedBlackView::drawLine(DRAWTOOLS& tools, rbnode* pNode)
 		drawLine(tools, pNode->lft);
 
 	RBData* pData = rb_entry(pNode, RBData, rbt);
-	tools.points[0].X = m_nWndOffset.X + pData->pos.X + pData->pos.Width / 2;
+	tools.points[0].X = m_nWndOffset.X + pData->pos.X + m_nNodeSize / 2;
 	tools.points[0].Y = m_nWndOffset.Y + pData->pos.Y + NODE_MARGIN / 2;
 	pData = rb_entry(rb_get_parent(pNode), RBData, rbt);
-	tools.points[2].X = m_nWndOffset.X + pData->pos.X + pData->pos.Width / 2;
-	tools.points[2].Y = m_nWndOffset.Y + pData->pos.Y + pData->pos.Height - NODE_MARGIN / 2;
+	tools.points[2].X = m_nWndOffset.X + pData->pos.X + m_nNodeSize / 2;
+	tools.points[2].Y = m_nWndOffset.Y + pData->pos.Y + m_nNodeSize - NODE_MARGIN / 2;
 	tools.points[1].X = (tools.points[0].X + tools.points[2].X) / 2;
 	tools.points[1].Y = (tools.points[0].Y + tools.points[2].Y) / 2;
 	if(rb_get_parent(pNode) != rb_get_nil())
