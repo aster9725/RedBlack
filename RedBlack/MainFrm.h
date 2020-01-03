@@ -7,14 +7,14 @@
 class CMainToolBar : public CToolBar
 {
 public:
-	CButton				m_wndCheckBox;
+	CButton		m_wndCheckBox;
 };
 
 
 class CMainFrame : public CFrameWnd
 {
 private:
-	BOOL m_bModeFlag;
+	BOOL		m_bModeFlag;
 
 protected: // serialization에서만 만들어집니다.
 	CMainFrame() noexcept;

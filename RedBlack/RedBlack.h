@@ -22,7 +22,7 @@ class CRedBlackApp : public CWinApp
 {
 public:
 	CRedBlackApp() noexcept;
-	ULONG_PTR m_gdiplusToken;
+	ULONG_PTR	m_gdiplusToken;
 
 // 재정의입니다.
 public:
