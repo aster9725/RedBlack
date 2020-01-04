@@ -39,48 +39,12 @@ END_MESSAGE_MAP()
 
 // CRedBlackView 생성/소멸
 
-void CRedBlackView::drawNode(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& posY)
-{
-	if (pNode->lft != rb_get_nil())
-		drawNode(tools, pNode->lft, ++depth, posY);
-
-	// Store node position refered from (0,0)
-	// Swap X,Y corrdinate to transform tree
-	RBData* pData = rb_entry(pNode, RBData, rbt);
-	pData->pos.Y = tools.canvasRect.X + depth * m_nNodeSize;
-	pData->pos.X = posY;
-
-	// Calculate real position of node to draw
-	RectF realRect;
-	realRect.X = m_nWndOffset.X + pData->pos.X + NODE_MARGIN/2;
-	realRect.Y = m_nWndOffset.Y + pData->pos.Y + NODE_MARGIN/2;
-	realRect.Width = realRect.Height = m_nNodeSize - NODE_MARGIN;
-	
-	// Draw node circle
-	tools.canvas.FillEllipse(rb_get_color(pNode) == RED ? &tools.redBrush : &tools.blackBrush, realRect);
-
-	// Draw node data on the circle
-	CString number;
-	number.Format(L"%d", pData->key);
-	tools.canvas.DrawString(number, number.GetLength(), &tools.font, realRect, &tools.strFormat, 
-		rb_get_color(pNode) == RED ? &tools.blackBrush : &tools.whiteBrush);
-
-	// Go to next Line
-	posY += m_nNodeSize;
-
-	if (pNode->rgt != rb_get_nil())
-		drawNode(tools, pNode->rgt, ++depth, posY);
-	--depth;
-}
-
 void CRedBlackView::drawTree(CDC* pDC)
 {
 	CRedBlackDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-
-	//pDC->SetROP2(R2_XORPEN);
 
 	Graphics canvas(pDC->m_hDC);
 	canvas.SetSmoothingMode(SmoothingModeHighQuality);
@@ -107,17 +71,49 @@ void CRedBlackView::drawTree(CDC* pDC)
 	canvasRect.Width -= NODE_MARGIN;
 	canvasRect.Height -= NODE_MARGIN;
 
-	//canvas.DrawRectangle(&pen, canvasRect);
-
 	struct rbtree* pTree = pDoc->GetRBTree();
 	if (pTree->pRoot == rb_get_nil())
 		return;
 
-	int depth, posY;
+	int depth, posX;
 	depth = 0;
-	posY = canvasRect.Y;
-	drawNode(tools, pTree->pRoot, depth, posY);
+	posX = canvasRect.Y;
+	drawNode(tools, pTree->pRoot, depth, posX);
 	drawLine(tools, pTree->pRoot);
+}
+
+void CRedBlackView::drawNode(DRAWTOOLS& tools, rbnode* pNode, int& depth, int& posX)
+{
+	if (pNode->lft != rb_get_nil())
+		drawNode(tools, pNode->lft, ++depth, posX);
+
+	// Store node position refered from (0,0)
+	// Swap X,Y corrdinate to transform tree
+	RBData* pData = rb_entry(pNode, RBData, rbt);
+	pData->pos.X = posX;
+	pData->pos.Y = tools.canvasRect.Y + depth * m_nNodeSize;
+
+	// Calculate real position of node to draw
+	RectF realRect;
+	realRect.X = m_nWndOffset.X + pData->pos.X + NODE_MARGIN/2;
+	realRect.Y = m_nWndOffset.Y + pData->pos.Y + NODE_MARGIN/2;
+	realRect.Width = realRect.Height = m_nNodeSize - NODE_MARGIN;
+	
+	// Draw node circle
+	tools.canvas.FillEllipse(rb_get_color(pNode) == RED ? &tools.redBrush : &tools.blackBrush, realRect);
+
+	// Draw node data on the circle
+	CString number;
+	number.Format(L"%d", pData->key);
+	tools.canvas.DrawString(number, number.GetLength(), &tools.font, realRect, &tools.strFormat, 
+		rb_get_color(pNode) == RED ? &tools.blackBrush : &tools.whiteBrush);
+
+	// Go to next Line
+	posX += m_nNodeSize;
+
+	if (pNode->rgt != rb_get_nil())
+		drawNode(tools, pNode->rgt, ++depth, posX);
+	--depth;
 }
 
 void CRedBlackView::drawLine(DRAWTOOLS& tools, rbnode* pNode)
@@ -265,6 +261,37 @@ void CRedBlackView::OnLButtonUp(UINT nFlags, CPoint point)
 }
 
 
+void CRedBlackView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nFlags & MK_CONTROL) 
+	{
+		m_bMoveFlag = TRUE;
+		SetCursor(AfxGetApp()->LoadStandardCursor(MAKEINTRESOURCE(IDC_HAND)));
+	}
+	CView::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+void CRedBlackView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nFlags & MK_CONTROL)
+		m_bMoveFlag = FALSE;
+
+	CView::OnKeyUp(nChar, nRepCnt, nFlags);
+}
+
+
+BOOL CRedBlackView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (m_bMoveFlag)
+		return TRUE;
+	return CView::OnSetCursor(pWnd, nHitTest, message);
+}
+
+
 void CRedBlackView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
@@ -302,33 +329,3 @@ BOOL CRedBlackView::OnEraseBkgnd(CDC* pDC)
 	return TRUE;
 }
 
-
-void CRedBlackView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	if (nFlags & MK_CONTROL) 
-	{
-		m_bMoveFlag = TRUE;
-		SetCursor(AfxGetApp()->LoadStandardCursor(MAKEINTRESOURCE(IDC_HAND)));
-	}
-	CView::OnKeyDown(nChar, nRepCnt, nFlags);
-}
-
-
-void CRedBlackView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	if (nFlags & MK_CONTROL)
-		m_bMoveFlag = FALSE;
-
-	CView::OnKeyUp(nChar, nRepCnt, nFlags);
-}
-
-
-BOOL CRedBlackView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
-{
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	if (m_bMoveFlag)
-		return TRUE;
-	return CView::OnSetCursor(pWnd, nHitTest, message);
-}

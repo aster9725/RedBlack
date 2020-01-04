@@ -141,6 +141,7 @@ void CMainFrame::OnAddNode()
 	staticText->SetWindowTextW(L"쉼표(,)로 구분된 데이터를 저장합니다.");
 }
 
+
 void CMainFrame::OnDeleteNode()
 {
 	m_wndDialogBar.GetDlgItem(IDC_MODE_CAPTION)->SetWindowTextW(L"Delete Node");
@@ -149,6 +150,7 @@ void CMainFrame::OnDeleteNode()
 	CStatic* staticText = (CStatic*)m_wndDialogBar.GetDlgItem(IDC_HELP_TEXT);
 	staticText->SetWindowTextW(L"쉼표(,)로 구분된 데이터를 삭제합니다.");
 }
+
 
 void CMainFrame::OnDeleteTree()
 {

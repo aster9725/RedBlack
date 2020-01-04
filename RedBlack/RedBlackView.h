@@ -33,7 +33,7 @@ private:
 
 	void drawTree(CDC* pDC);
 	void drawLine(DRAWTOOLS& tools, struct rbnode* pNode);
-	void drawNode(DRAWTOOLS& tools, struct rbnode* pNode, int& depth, int& posY);
+	void drawNode(DRAWTOOLS& tools, struct rbnode* pNode, int& depth, int& posX);
 protected: // serialization에서만 만들어집니다.
 	CRedBlackView() noexcept;
 	DECLARE_DYNCREATE(CRedBlackView)
